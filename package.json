@@ -1,0 +1,23 @@
+{
+  "name": "socketserver",
+  "version": "0.0.1",
+  "description": "Socket.io backend for minihacks",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dwcares/socketserver"
+  },
+  "author": "dwcares",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dwcares/socketserver/issues"
+  },
+  "homepage": "https://github.com/dwcares/socketserver",
+  "dependencies": {
+    "express": "^4.10.2",
+    "socket.io": "^1.3.5"
+  }
+}
