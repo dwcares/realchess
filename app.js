@@ -11,8 +11,7 @@ io.on('connection', function(socket) {
     console.log('a user is connected');
 
     socket.on('button', function(msg) {
-        console.log("got button message");
-       console.log(msg); 
+        io.emit('button', msg);
     });
 
     socket.on('disconnect', function() {
