@@ -1,2 +1,2 @@
-# socketserver
-A test server for web sockets project
+# Real Chess
+Real-time chess game 
