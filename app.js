@@ -24,8 +24,11 @@ io.on('connection', function(socket) {
             players: [opponent.username, socket.username],
             board: null
         };
+        
+        socket.gameId = game.id;
+        opponent.gameId = game.id;
   
-        console.log('starting game');
+        console.log('starting game: ' + game.id);
         opponent.emit('join', {game: game, color: 'white'});
         socket.emit('join', {game: game, color: 'black'});
         
@@ -43,11 +46,26 @@ io.on('connection', function(socket) {
 
     socket.on('disconnect', function() {
         console.log(socket.username + ' disconnected');
+        
+      removeGame(socket.gameId);
 
-      socket.broadcast.emit('user left', {
-        username: socket.username
+      socket.broadcast.emit('leave', {
+        username: socket.username,
+        gameId: socket.gameId
       });
     });
+    
+    
+    var removeGame = function(id) {
+        console.log("removing game: " + id);
+        
+        for (var i = 0; i<games.length; i++) {
+            if (games[i].id === id) {
+                games.splice(i,1);
+                console.log("removed it.")
+            }
+        }
+    }
 });
 
 http.listen(port, function() {

@@ -23,6 +23,15 @@
         }
       });
       
+      socket.on('leave', function (msg) {
+        if (msg.gameId === serverGame.id) {
+           serverGame = null;
+           game = null;
+           board.destroy();
+           socket.disconnect();
+        }
+      });
+      
       var initGame = function (serverGameState) {
         serverGame = serverGameState; 
         
