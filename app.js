@@ -5,45 +5,47 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var port = process.env.PORT || 3000;
 
-var usernames = {};
-var numUsers = 0;
+var games = [];
+var waitingUsers = [];
 
 app.get('/', function(req, res) {
  res.sendFile(__dirname + '/public/index.html');
 });
 
 io.on('connection', function(socket) {
-    console.log('a user is connected');
     
-    socket.username =  "name "+Math.random();
-    socket.color = numUsers < 1 ? 'white' : 'black';
-    usernames[socket.username] = socket.username;
-    ++numUsers;
+    socket.username =  "user" + Math.floor((Math.random() * 100) + 1);
     
-    socket.emit('join', {
-        color: socket.color
-    })
-
-    socket.broadcast.emit('user joined', {
-      username: socket.username,
-      color: socket.color,
-      numUsers: numUsers
-    });
+    console.log(socket.username + ' connected');
+    if (waitingUsers.length > 0) {
+        var opponent = waitingUsers.pop();
+        var game = {
+            id: Math.floor((Math.random() * 100) + 1),
+            players: [opponent.username, socket.username],
+            board: null
+        };
+  
+        console.log('starting game');
+        opponent.emit('join', {game: game, color: 'white'});
+        socket.emit('join', {game: game, color: 'black'});
+        
+        games.push(game);
+        
+    } else {
+        console.log(socket.username + ' joining lobby');
+        waitingUsers.push(socket);
+    }
     
     socket.on('move', function(msg) {
         socket.broadcast.emit('move', msg);
         console.log(msg);
     });
 
-
     socket.on('disconnect', function() {
-        console.log('a user is disconnected');
-         delete usernames[socket.username];
-        --numUsers;
+        console.log(socket.username + ' disconnected');
 
       socket.broadcast.emit('user left', {
-        username: socket.username,
-        numUsers: numUsers
+        username: socket.username
       });
     });
 });

@@ -1,13 +1,17 @@
 <!doctype html>
 <html>
   <head>
+        <meta name="viewport" content="width=device-width; initial-scale=1; maximum-scale=1; user-scalable=no; minimal-ui">
     <title>Real Chess</title>
     <link rel="stylesheet" href="/lib/chessboard-0.3.0.min.css">
+    <link rel="stylesheet" href="lib/Microsoft.WinJS.4.0/css/ui-light.css" />
+    <link rel="stylesheet" href="css/default.css" />
   </head>
-  <body onload="window.init();">
+  <body>
     <div id='board' style="width: 400px"></div>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="lib/Microsoft.WinJS.4.0/js/WinJS.min.js"></script>
     <script src="/lib/chess.min.js"></script> 
     <script src="/lib/chessboard-0.3.0.min.js"></script> 
     <script src="/default.js"></script>
