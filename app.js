@@ -13,31 +13,34 @@ app.get('/', function(req, res) {
 });
 
 io.on('connection', function(socket) {
-    
-    socket.username =  "user" + Math.floor((Math.random() * 100) + 1);
-    
-    console.log(socket.username + ' connected');
-    if (waitingUsers.length > 0) {
-        var opponent = waitingUsers.pop();
-        var game = {
-            id: Math.floor((Math.random() * 100) + 1),
-            players: [opponent.username, socket.username],
-            board: null
-        };
+    console.log('new connection');
+     
+    socket.on('login', function(msg) {
+        socket.username = msg.username;
+        console.log(socket.username + ' connected');
         
-        socket.gameId = game.id;
-        opponent.gameId = game.id;
-  
-        console.log('starting game: ' + game.id);
-        opponent.emit('join', {game: game, color: 'white'});
-        socket.emit('join', {game: game, color: 'black'});
-        
-        games.push(game);
-        
-    } else {
-        console.log(socket.username + ' joining lobby');
-        waitingUsers.push(socket);
-    }
+        if (waitingUsers.length > 0) {
+            var opponent = waitingUsers.pop();
+            var game = {
+                id: Math.floor((Math.random() * 100) + 1),
+                players: [opponent.username, socket.username],
+                board: null
+            };
+            
+            socket.gameId = game.id;
+            opponent.gameId = game.id;
+      
+            console.log('starting game: ' + game.id);
+            opponent.emit('join', {game: game, color: 'white'});
+            socket.emit('join', {game: game, color: 'black'});
+            
+            games.push(game);
+            
+        } else {
+            console.log(socket.username + ' joining lobby');
+            waitingUsers.push(socket);
+        }
+    });
     
     socket.on('move', function(msg) {
         socket.broadcast.emit('move', msg);

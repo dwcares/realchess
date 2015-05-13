@@ -1,19 +1,36 @@
 <!doctype html>
 <html>
   <head>
-        <meta name="viewport" content="width=410; initial-scale=1; maximum-scale=1; user-scalable=no; minimal-ui">
+    <meta name="viewport" content="width=410; user-scalable=no; minimal-ui">
     <title>Real Chess</title>
-    <link rel="stylesheet" href="/lib/chessboard-0.3.0.min.css">
-    <link rel="stylesheet" href="lib/Microsoft.WinJS.4.0/css/ui-light.css" />
-    <link rel="stylesheet" href="css/default.css" />
+    <link rel="stylesheet" href="lib/chessboard-0.3.0.min.css">
+    <link rel="stylesheet" href="lib/WinJS.4.0/css/ui-light.css" />
+    <link rel="stylesheet" href="/default.css" />
   </head>
   <body>
-    <div id='board' style="width: 400px"></div>
-    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
-    <script src="lib/Microsoft.WinJS.4.0/js/WinJS.min.js"></script>
-    <script src="/lib/chess.min.js"></script> 
-    <script src="/lib/chessboard-0.3.0.min.js"></script> 
+    <div id='home'>
+      <input id='username'></input>
+      <button id='login'>Login</button>
+    </div>
+    <div id='lobby'>
+      <div id='myGames'>
+        <button id='testGame'>Resume game</button>
+      </div>
+       <div id='players'>
+        <button id='player1'>Player 1</button>
+        <button id='player2'>Player 2</button>
+      </div>
+    </div>
+    <div id='game'>
+      <div id='board' style="width: 400px">
+      </div>
+    </div>
+
+    <script src="lib/socket.io-1.2.0.js"></script>
+    <script src="lib/jquery-1.11.1.js"></script>
+    <script src="lib/WinJS.4.0/js/WinJS.min.js"></script>
+    <script src="lib/chess.min.js"></script> 
+    <script src="lib/chessboard-0.3.0.min.js"></script> 
     <script src="/default.js"></script>
   </body>
 </html>

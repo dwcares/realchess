@@ -6,6 +6,10 @@
       var game, board, socket, playerColor, serverGame;
       socket = io();
       
+      $('#login').on('click', function() {
+        socket.emit('login', {username: $('#username').val()});
+      });
+      
       socket.on('join', function(msg) {
         console.log("joined as game id: " + msg.game.id );   
         playerColor = msg.color;

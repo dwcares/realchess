@@ -1,0 +1,13 @@
+body {
+	overflow-y: auto;
+	padding-left: 40px;
+	padding-top: 40px;
+}
+
+input {
+	margin-bottom: 20px;
+}
+
+button {
+	margin-bottom: 20px;
+}
