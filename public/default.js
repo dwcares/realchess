@@ -4,22 +4,43 @@
     WinJS.UI.processAll().then(function () {
       
       var game, board, socket, playerColor, serverGame;
+      var usersOnline = [];
       socket = io();
+           
+      //////////////////////////////
+      // Socket.io handlers
+      ////////////////////////////// 
       
-      $('#login').on('click', function() {
-        socket.emit('login', {username: $('#username').val()});
+      socket.on('login', function(msg) {
+            usersOnline = msg;
+            updateUserList();
       });
       
-      socket.on('join', function(msg) {
+      socket.on('joinlobby', function (msg) {
+        usersOnline.push(msg);
+        updateUserList();
+      });
+      
+       socket.on('leavelobby', function (msg) {
+        for (var i=0; i<usersOnline.length; i++) {
+            if (usersOnline[i] === msg) {
+                usersOnline.splice(i, 1);
+            }
+        }
+        
+        updateUserList();
+      });
+          
+          
+      socket.on('joingame', function(msg) {
         console.log("joined as game id: " + msg.game.id );   
         playerColor = msg.color;
         initGame(msg.game);
+        
+        $('#page-lobby').hide();
+        $('#page-game').show();
       });
-      
-      socket.on('user joined', function (msg) {
-
-      });
-  
+        
       socket.on('move', function (msg) {
         if (msg.gameId === serverGame.id) {
            game.move(msg.move);
@@ -27,7 +48,7 @@
         }
       });
       
-      socket.on('leave', function (msg) {
+      socket.on('logout', function (msg) {
         if (msg.gameId === serverGame.id) {
            serverGame = null;
            game = null;
@@ -35,6 +56,32 @@
            socket.disconnect();
         }
       });
+      
+      //////////////////////////////
+      // Menus
+      ////////////////////////////// 
+      $('#login').on('click', function() {
+        socket.emit('login',  $('#username').val());
+        
+        $('#page-login').hide();
+        $('#page-lobby').show();
+        
+      });
+      
+      var updateUserList = function() {
+        document.getElementById('userList').innerHTML = '';
+        usersOnline.forEach(function(user) {
+          $('#userList').append($('<button>')
+                        .text(user)
+                        .on('click', function() {
+                          socket.emit('invite',  user);
+                        }));
+        });
+      };
+           
+      //////////////////////////////
+      // Chess Game
+      ////////////////////////////// 
       
       var initGame = function (serverGameState) {
         serverGame = serverGameState; 

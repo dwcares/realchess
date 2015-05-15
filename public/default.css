@@ -11,3 +11,11 @@ input {
 button {
 	margin-bottom: 20px;
 }
+
+#page-lobby{
+	display: none;
+}
+
+#page-game {
+	display: none;
+}

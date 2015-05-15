@@ -7,6 +7,9 @@ var port = process.env.PORT || 3000;
 
 var games = [];
 var waitingUsers = [];
+var lobbyUsers = {};
+var users = {};
+var activeGames = {};
 
 app.get('/', function(req, res) {
  res.sendFile(__dirname + '/public/index.html');
@@ -16,30 +19,40 @@ io.on('connection', function(socket) {
     console.log('new connection');
      
     socket.on('login', function(msg) {
-        socket.username = msg.username;
-        console.log(socket.username + ' connected');
+        console.log(msg + ' joining lobby');
+        socket.username = msg;  
+        socket.emit('login', Object.keys(lobbyUsers));
         
-        if (waitingUsers.length > 0) {
-            var opponent = waitingUsers.pop();
-            var game = {
-                id: Math.floor((Math.random() * 100) + 1),
-                players: [opponent.username, socket.username],
-                board: null
-            };
-            
-            socket.gameId = game.id;
-            opponent.gameId = game.id;
-      
-            console.log('starting game: ' + game.id);
-            opponent.emit('join', {game: game, color: 'white'});
-            socket.emit('join', {game: game, color: 'black'});
-            
-            games.push(game);
-            
-        } else {
-            console.log(socket.username + ' joining lobby');
-            waitingUsers.push(socket);
-        }
+       
+        users[socket.username] = socket;
+        lobbyUsers[socket.username] = socket;
+        
+        socket.broadcast.emit('joinlobby', socket.username);
+    });
+    
+    socket.on('invite', function(msg) {
+        console.log('got an invite from: ' + msg);
+        
+        socket.broadcast.emit('leavelobby', socket.username);
+        socket.broadcast.emit('leavelobby', msg);
+        
+        delete lobbyUsers[socket.username];
+        delete lobbyUsers[msg];
+       
+        var game = {
+            id: Math.floor((Math.random() * 100) + 1),
+            players: [socket.username, msg],
+            board: null
+        };
+        
+        socket.gameId = game.id;
+        users[msg].gameId = game.id;
+  
+        console.log('starting game: ' + game.id);
+        socket.emit('joingame', {game: game, color: 'white'});
+        users[msg].emit('joingame', {game: game, color: 'black'});
+
+        games.push(game);
     });
     
     socket.on('move', function(msg) {
@@ -51,8 +64,8 @@ io.on('connection', function(socket) {
         console.log(socket.username + ' disconnected');
         
       removeGame(socket.gameId);
-
-      socket.broadcast.emit('leave', {
+      
+      socket.broadcast.emit('logout', {
         username: socket.username,
         gameId: socket.gameId
       });
@@ -69,6 +82,7 @@ io.on('connection', function(socket) {
             }
         }
     }
+    
 });
 
 http.listen(port, function() {
