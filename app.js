@@ -5,8 +5,6 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var port = process.env.PORT || 3000;
 
-var games = [];
-var waitingUsers = [];
 var lobbyUsers = {};
 var users = {};
 var activeGames = {};
@@ -18,71 +16,92 @@ app.get('/', function(req, res) {
 io.on('connection', function(socket) {
     console.log('new connection');
      
-    socket.on('login', function(msg) {
-        console.log(msg + ' joining lobby');
-        socket.username = msg;  
-        socket.emit('login', Object.keys(lobbyUsers));
+    socket.on('login', function(userId) {
+        console.log(userId + ' joining lobby');
+        socket.userId = userId;  
+     
+        if (!users[userId]) {    
+            console.log('creating new user');
+            users[userId] = {userId: socket.userId, games:{}};
+        } else {
+            console.log('user found!');
+            Object.keys(users[userId].games).forEach(function(gameId) {
+                console.log('gameid - ' + gameId);
+            });
+        }
         
-       
-        users[socket.username] = socket;
-        lobbyUsers[socket.username] = socket;
+        socket.emit('login', {users: Object.keys(lobbyUsers), games: Object.keys(users[userId].games)});
+        lobbyUsers[userId] = socket;
         
-        socket.broadcast.emit('joinlobby', socket.username);
+        socket.broadcast.emit('joinlobby', socket.userId);
     });
     
-    socket.on('invite', function(msg) {
-        console.log('got an invite from: ' + msg);
+    socket.on('invite', function(opponentId) {
+        console.log('got an invite from: ' + socket.userId + ' --> ' + opponentId);
         
-        socket.broadcast.emit('leavelobby', socket.username);
-        socket.broadcast.emit('leavelobby', msg);
-        
-        delete lobbyUsers[socket.username];
-        delete lobbyUsers[msg];
+        socket.broadcast.emit('leavelobby', socket.userId);
+        socket.broadcast.emit('leavelobby', opponentId);
+      
        
         var game = {
             id: Math.floor((Math.random() * 100) + 1),
-            players: [socket.username, msg],
-            board: null
+            board: null, 
+            users: {white: socket.userId, black: opponentId}
         };
         
         socket.gameId = game.id;
-        users[msg].gameId = game.id;
+        activeGames[game.id] = game;
+        
+        users[game.users.white].games[game.id] = game.id;
+        users[game.users.black].games[game.id] = game.id;
   
         console.log('starting game: ' + game.id);
-        socket.emit('joingame', {game: game, color: 'white'});
-        users[msg].emit('joingame', {game: game, color: 'black'});
-
-        games.push(game);
+        lobbyUsers[game.users.white].emit('joingame', {game: game, color: 'white'});
+        lobbyUsers[game.users.black].emit('joingame', {game: game, color: 'black'});
+        
+        delete lobbyUsers[game.users.white];
+        delete lobbyUsers[game.users.black];   
+    });
+    
+     socket.on('resumegame', function(gameId) {
+        console.log('ready to resume game: ' + gameId);
+         
+        socket.gameId = gameId;
+        var game = activeGames[gameId];
+        
+        users[game.users.white].games[game.id] = game.id;
+        users[game.users.black].games[game.id] = game.id;
+  
+        console.log('resuming game: ' + game.id);
+        if (lobbyUsers[game.users.white]) {
+            lobbyUsers[game.users.white].emit('joingame', {game: game, color: 'white'});
+            delete lobbyUsers[game.users.white];
+        }
+        
+        if (lobbyUsers[game.users.black]) {
+            lobbyUsers[game.users.black] && lobbyUsers[game.users.black].emit('joingame', {game: game, color: 'black'});
+            delete lobbyUsers[game.users.black];  
+        }
     });
     
     socket.on('move', function(msg) {
         socket.broadcast.emit('move', msg);
+        activeGames[msg.gameId].board = msg.board;
         console.log(msg);
     });
 
-    socket.on('disconnect', function() {
-        console.log(socket.username + ' disconnected');
-        
-      removeGame(socket.gameId);
+    socket.on('disconnect', function(msg) {
+      console.log(socket.userId + ' disconnected');
+      console.log(socket.gameId + ' disconnected');
+      
+      delete lobbyUsers[socket.userId];
       
       socket.broadcast.emit('logout', {
-        username: socket.username,
+        userId: socket.userId,
         gameId: socket.gameId
       });
     });
-    
-    
-    var removeGame = function(id) {
-        console.log("removing game: " + id);
-        
-        for (var i = 0; i<games.length; i++) {
-            if (games[i].id === id) {
-                games.splice(i,1);
-                console.log("removed it.")
-            }
-        }
-    }
-    
+           
 });
 
 http.listen(port, function() {

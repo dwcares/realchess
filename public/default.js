@@ -3,8 +3,11 @@
     
     WinJS.UI.processAll().then(function () {
       
-      var game, board, socket, playerColor, serverGame;
+      var socket, serverGame;
+      var username, playerColor;
+      var game, board;
       var usersOnline = [];
+      var myGames = [];
       socket = io();
            
       //////////////////////////////
@@ -12,26 +15,29 @@
       ////////////////////////////// 
       
       socket.on('login', function(msg) {
-            usersOnline = msg;
+            usersOnline = msg.users;
             updateUserList();
+            
+            myGames = msg.games;
+            updateGamesList();
       });
       
       socket.on('joinlobby', function (msg) {
-        usersOnline.push(msg);
-        updateUserList();
+        addUser(msg);
       });
       
        socket.on('leavelobby', function (msg) {
-        for (var i=0; i<usersOnline.length; i++) {
-            if (usersOnline[i] === msg) {
-                usersOnline.splice(i, 1);
-            }
-        }
-        
-        updateUserList();
+        removeUser(msg);
       });
-          
-          
+      
+      socket.on('gameadd', function(msg) {
+            
+      });
+      
+      socket.on('gameremove', function(msg) {
+            
+      });
+                  
       socket.on('joingame', function(msg) {
         console.log("joined as game id: " + msg.game.id );   
         playerColor = msg.color;
@@ -49,24 +55,80 @@
       });
       
       socket.on('logout', function (msg) {
-        if (msg.gameId === serverGame.id) {
+          
+        // a game has started with this player, quit the game for everyone
+        if (serverGame && msg.gameId === serverGame.id) {
            serverGame = null;
            game = null;
            board.destroy();
-           socket.disconnect();
+        
+            if (msg.username !== username) {
+                // go back to lobby if who i'm playing quits during a game
+                socket.emit('login',  $('#username').val());
+                
+                $('#page-login').hide();
+                $('#page-lobby').show();
+            }
         }
+        
+        removeUser(msg.username);
+        
       });
+      
+
       
       //////////////////////////////
       // Menus
       ////////////////////////////// 
       $('#login').on('click', function() {
-        socket.emit('login',  $('#username').val());
+        username = $('#username').val();
+        $('#userLabel').text(username);
+        socket.emit('login', username);
         
         $('#page-login').hide();
         $('#page-lobby').show();
         
       });
+      
+      $('#game-back').on('click', function() {
+        socket.emit('login', username);
+        
+        $('#page-game').hide();
+        $('#page-lobby').show();
+      });
+      
+      $('#game-resign').on('click', function() {
+        socket.emit('resign', {userId: username, gameId: serverGame.id});
+        
+        $('#page-game').hide();
+        $('#page-lobby').show();
+      });
+      
+      var addUser = function(userId) {
+        usersOnline.push(userId);
+        updateUserList();
+      }
+    
+     var removeUser = function(userId) {
+          for (var i=0; i<usersOnline.length; i++) {
+            if (usersOnline[i] === userId) {
+                usersOnline.splice(i, 1);
+            }
+         }
+         
+         updateUserList();
+      };
+      
+      var updateGamesList = function() {
+        document.getElementById('gamesList').innerHTML = '';
+        myGames.forEach(function(game) {
+          $('#gamesList').append($('<button>')
+                        .text(game)
+                        .on('click', function() {
+                          socket.emit('resumegame',  game);
+                        }));
+        });
+      };
       
       var updateUserList = function() {
         document.getElementById('userList').innerHTML = '';
@@ -90,14 +152,14 @@
             draggable: true,
             showNotation: false,
             orientation: playerColor,
-            position: 'start',
+            position: serverGame.board ? serverGame.board : 'start',
             onDragStart: onDragStart,
             onDrop: onDrop,
             onSnapEnd: onSnapEnd
           };
-      
-          game = new Chess();
-          board = new ChessBoard('board', cfg);
+               
+          game = serverGame.board ? new Chess(serverGame.board) : new Chess();
+          board = new ChessBoard('game-board', cfg);
       }
        
       // do not pick up pieces if the game is over
