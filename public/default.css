@@ -19,3 +19,16 @@ button {
 #page-game {
 	display: none;
 }
+
+.circle {
+	background-color: green;
+	width: 30px;
+	height: 30px;
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    border-radius: 15px; 
+}
+
+.circle.offline {
+	background-color: yellow;
+}

@@ -45,6 +45,7 @@
         
         $('#page-lobby').hide();
         $('#page-game').show();
+        
       });
         
       socket.on('move', function (msg) {
@@ -53,26 +54,10 @@
            board.position(game.fen());
         }
       });
+     
       
       socket.on('logout', function (msg) {
-          
-        // a game has started with this player, quit the game for everyone
-        if (serverGame && msg.gameId === serverGame.id) {
-           serverGame = null;
-           game = null;
-           board.destroy();
-        
-            if (msg.username !== username) {
-                // go back to lobby if who i'm playing quits during a game
-                socket.emit('login',  $('#username').val());
-                
-                $('#page-login').hide();
-                $('#page-lobby').show();
-            }
-        }
-        
         removeUser(msg.username);
-        
       });
       
 
@@ -107,7 +92,7 @@
       var addUser = function(userId) {
         usersOnline.push(userId);
         updateUserList();
-      }
+      };
     
      var removeUser = function(userId) {
           for (var i=0; i<usersOnline.length; i++) {
@@ -172,6 +157,8 @@
           return false;
         }
       };  
+      
+    
       
       var onDrop = function(source, target) {
         // see if the move is legal

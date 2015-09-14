@@ -89,8 +89,10 @@ io.on('connection', function(socket) {
         activeGames[msg.gameId].board = msg.board;
         console.log(msg);
     });
-
+    
     socket.on('disconnect', function(msg) {
+        
+      console.log(msg);
       console.log(socket.userId + ' disconnected');
       console.log(socket.gameId + ' disconnected');
       
