@@ -1,11 +1,14 @@
 body {
 	overflow-y: auto;
-	padding-left: 40px;
-	padding-top: 40px;
+	
+	display: flex;
+	flex-flow: column;
+	align-content: center;
+	align-items: center;
 }
 
 .page {
-	
+	margin-top: 20px;
 }
 
 .page-login {
@@ -51,6 +54,10 @@ body {
 		margin-bottom: 10px;
 		margin-top: 40px;
 	}
+	
+.page.game button {
+	margin-bottom: 10px;	
+}
 
 #page-lobby{
 	display: none;
