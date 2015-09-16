@@ -49,7 +49,7 @@
       });
         
       socket.on('move', function (msg) {
-        if (msg.gameId === serverGame.id) {
+        if (serverGame && msg.gameId === serverGame.id) {
            game.move(msg.move);
            board.position(game.fen());
         }

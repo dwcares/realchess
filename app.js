@@ -35,7 +35,8 @@ io.on('connection', function(socket) {
             });
         }
         
-        socket.emit('login', {users: Object.keys(lobbyUsers), games: Object.keys(users[userId].games)});
+        socket.emit('login', {users: Object.keys(lobbyUsers), 
+                              games: Object.keys(users[userId].games)});
         lobbyUsers[userId] = socket;
         
         socket.broadcast.emit('joinlobby', socket.userId);
@@ -66,6 +67,8 @@ io.on('connection', function(socket) {
         
         delete lobbyUsers[game.users.white];
         delete lobbyUsers[game.users.black];   
+        
+        socket.broadcast.emit('gameadd', {gameId: game.id, gameState:game});
     });
     
      socket.on('resumegame', function(gameId) {
@@ -84,7 +87,8 @@ io.on('connection', function(socket) {
         }
         
         if (lobbyUsers[game.users.black]) {
-            lobbyUsers[game.users.black] && lobbyUsers[game.users.black].emit('joingame', {game: game, color: 'black'});
+            lobbyUsers[game.users.black] && 
+            lobbyUsers[game.users.black].emit('joingame', {game: game, color: 'black'});
             delete lobbyUsers[game.users.black];  
         }
     });
@@ -115,10 +119,7 @@ io.on('connection', function(socket) {
     
     socket.on('dashboardlogin', function() {
         console.log('dashboard joined');
-        
-        socket.gameses = ["hi", "hi"];
-        socket.emit('dashboardlogin', {games: activeGames});
-        
+        socket.emit('dashboardlogin', {games: activeGames}); 
     });
            
 });

@@ -6,3 +6,8 @@ body {
 	background-color: lightblue;
 	overflow-y: auto;
 }
+
+#games {
+	display: flex;
+	flex-flow: row wrap;
+}
