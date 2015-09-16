@@ -1,0 +1,8 @@
+.gameboard {
+	width: 400px;
+}
+
+body {
+	background-color: lightblue;
+	overflow-y: auto;
+}

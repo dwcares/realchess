@@ -67,12 +67,14 @@
       ////////////////////////////// 
       $('#login').on('click', function() {
         username = $('#username').val();
-        $('#userLabel').text(username);
-        socket.emit('login', username);
         
-        $('#page-login').hide();
-        $('#page-lobby').show();
-        
+        if (username.length > 0) {
+            $('#userLabel').text(username);
+            socket.emit('login', username);
+            
+            $('#page-login').hide();
+            $('#page-lobby').show();
+        } 
       });
       
       $('#game-back').on('click', function() {
@@ -108,7 +110,7 @@
         document.getElementById('gamesList').innerHTML = '';
         myGames.forEach(function(game) {
           $('#gamesList').append($('<button>')
-                        .text(game)
+                        .text('#'+ game)
                         .on('click', function() {
                           socket.emit('resumegame',  game);
                         }));

@@ -2,24 +2,30 @@
 <html>
   <head>
     <meta name="viewport" content="width=410; user-scalable=no; minimal-ui">
-    <title>Real Chess</title>
+    <title>Real Chess 2</title>
     <link rel="stylesheet" href="lib/chessboard-0.3.0.min.css">
     <link rel="stylesheet" href="lib/WinJS.4.0/css/ui-light.css" />
     <link rel="stylesheet" href="/default.css" />
   </head>
   <body>
-    <div id='page-login'>
+    <div class="page login" id='page-login'>
+      <div class='logo'></div>
       <input id='username'></input>
       <button id='login'>Login</button>
     </div>
-    <div id='page-lobby'>
+    <div class="page lobby" id='page-lobby'>
+      <h1>Real Chess</h1>
       <h2 id='userLabel'></h2>
+      <h3>Active games</h3>
       <div id='gamesList'>
+        No active games
       </div>
+      <h3>Online players</h3>
        <div id='userList'>
+         No users online
       </div>
     </div>
-    <div id='page-game'>
+    <div class="page game" id='page-game'>
       <button id='game-back'>Back</button>
       <button id='game-quit'>Resign</button>
       <div id='game-board' style="width: 400px">

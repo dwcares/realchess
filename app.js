@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 app.use(express.static('public'));
+app.use(express.static('dashboard'));
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var port = process.env.PORT || 3000;
@@ -13,8 +14,12 @@ app.get('/', function(req, res) {
  res.sendFile(__dirname + '/public/index.html');
 });
 
+app.get('/dashboard/', function(req, res) {
+ res.sendFile(__dirname + '/dashboard/dashboard.html');
+});
+
 io.on('connection', function(socket) {
-    console.log('new connection');
+    console.log('new connection ' + socket);
      
     socket.on('login', function(userId) {
         console.log(userId + ' joining lobby');
@@ -102,6 +107,18 @@ io.on('connection', function(socket) {
         userId: socket.userId,
         gameId: socket.gameId
       });
+    });
+    
+    /////////////////////
+    // Dashboard messages 
+    /////////////////////
+    
+    socket.on('dashboardlogin', function() {
+        console.log('dashboard joined');
+        
+        socket.gameses = ["hi", "hi"];
+        socket.emit('dashboardlogin', {games: activeGames});
+        
     });
            
 });
