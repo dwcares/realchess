@@ -102,8 +102,11 @@ io.on('connection', function(socket) {
     socket.on('disconnect', function(msg) {
         
       console.log(msg);
-      console.log(socket.userId + ' disconnected');
-      console.log(socket.gameId + ' disconnected');
+      
+      if (socket && socket.userId && socket.gameId) {
+        console.log(socket.userId + ' disconnected');
+        console.log(socket.gameId + ' disconnected');
+      }
       
       delete lobbyUsers[socket.userId];
       
