@@ -19,6 +19,10 @@ body {
 	.page.login .logo {
 		display: block;
 		background-color: lightgray;
+		background-image: url('/img/chesslogo.jpg');
+		background-size: cover;
+		background-position: center center;
+
 		margin-bottom: 50px;	
 		
 		width: 350px;
@@ -33,6 +37,7 @@ body {
 	
 	.page.login input {
 		margin-bottom: 20px;
+		width: 202px;
 		height: 25px;
 		font-size: 12pt;
 		padding: 2px;
@@ -41,10 +46,6 @@ body {
 		-moz-border-radius: 5px;
 		border-radius: 5px; 
 	}
-
-.page.lobby {
-	
-}
 
 	.page.lobby h2 {
 		color: darkgrey;

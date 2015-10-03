@@ -12,6 +12,7 @@ var activeGames = {};
 
 app.get('/', function(req, res) {
  res.sendFile(__dirname + '/public/index.html');
+
 });
 
 app.get('/dashboard/', function(req, res) {
@@ -20,7 +21,7 @@ app.get('/dashboard/', function(req, res) {
 
 io.on('connection', function(socket) {
     console.log('new connection ' + socket);
-     
+    
     socket.on('login', function(userId) {
         console.log(userId + ' joining lobby');
         socket.userId = userId;  
