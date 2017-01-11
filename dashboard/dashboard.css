@@ -1,13 +1,29 @@
 .gameboard {
-	width: 400px;
+	width: 200px;
+	margin-left: 5px;
+	margin-top: 5px;
 }
 
 body {
-	background-color: lightblue;
 	overflow-y: auto;
 }
 
 #games {
 	display: flex;
 	flex-flow: row wrap;
+
+	/*transform: scale(0.5);*/
+}
+
+#slides {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	z-index: 99999;
+
+}
+
+
+#slidesImg {
+	width: 100%;
 }
