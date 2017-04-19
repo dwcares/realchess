@@ -23,7 +23,10 @@ io.on('connection', function(socket) {
     console.log('new connection ' + socket);
     
     socket.on('login', function(userId) {
-        console.log(userId + ' joining lobby');
+       doLogin(socket, userId);
+    });
+
+    function doLogin(socket, userId) {
         socket.userId = userId;  
      
         if (!users[userId]) {    
@@ -41,7 +44,7 @@ io.on('connection', function(socket) {
         lobbyUsers[userId] = socket;
         
         socket.broadcast.emit('joinlobby', socket.userId);
-    });
+    }
     
     socket.on('invite', function(opponentId) {
         console.log('got an invite from: ' + socket.userId + ' --> ' + opponentId);
@@ -100,6 +103,17 @@ io.on('connection', function(socket) {
         console.log(msg);
     });
     
+    socket.on('resign', function(msg) {
+        console.log("resign: " + msg);
+
+        delete users[activeGames[msg.gameId].users.white].games[msg.gameId];
+        delete users[activeGames[msg.gameId].users.black].games[msg.gameId];
+        delete activeGames[msg.gameId];
+
+        socket.broadcast.emit('resign', msg);
+    });
+    
+
     socket.on('disconnect', function(msg) {
         
       console.log(msg);

@@ -31,11 +31,16 @@
       });
       
       socket.on('gameadd', function(msg) {
-            
       });
       
-      socket.on('gameremove', function(msg) {
-            
+      socket.on('resign', function(msg) {
+            if (msg.gameId == serverGame.id) {
+
+              socket.emit('login', username);
+
+              $('#page-lobby').show();
+              $('#page-game').hide();
+            }            
       });
                   
       socket.on('joingame', function(msg) {
@@ -87,6 +92,7 @@
       $('#game-resign').on('click', function() {
         socket.emit('resign', {userId: username, gameId: serverGame.id});
         
+        socket.emit('login', username);
         $('#page-game').hide();
         $('#page-lobby').show();
       });

@@ -6,53 +6,8 @@
       var socket = io();
       var games = {};
       var boards = {};
-      var slides = ['img/slide1.jpg',
-                    'img/slide2.jpg',
-                    'img/slide4.jpg',
-                    'img/slide3.jpg',
-                    'img/slide5.jpg',
-                    'img/slide6.jpg',
-                    'img/slide8.jpg',
-                    'img/slide9.jpg',
-                    'img/slide10.jpg',
-                    'img/slide11.jpg',
-                    'img/slide12.jpg',
-                    'img/slide13.jpg',
-                    'img/slide14.jpg',
-                    'img/githublink.gif',
-                    'img/slide16.jpg',
-                    'hide'];
 
-      var slidesDiv = document.getElementById('slides');
-      var slidesImg = document.getElementById('slidesImg');
 
-      var currentSlide = 0;
-      slidesImg.src = slides[currentSlide];
-
-      window.addEventListener('keyup', function(e) {
-
-            switch (e.key) {
-                  case "Left":
-                  case "Down":
-                        currentSlide--
-                        
-                        if (currentSlide < 0) currentSlide = slides.length -1;   
-                        slidesImg.src = slides[currentSlide];
-                   
-                  break;
-                  default: 
-                        currentSlide++;
-                        
-                        if (currentSlide >= slides.length) currentSlide = 0;
-                        slidesImg.src = slides[currentSlide];
-
-                        if (slides[currentSlide]=='hide')
-                              slidesDiv.style.display = 'none';
-                        else
-                              slidesDiv.style.display = 'block';
-            }  
-      })
-           
       //////////////////////////////
       // Socket.io handlers
       ////////////////////////////// 
@@ -65,6 +20,11 @@
       
       socket.on('gameadd', function(msg) {
             initGame(msg.gameId, msg.gameState)
+      });
+
+      socket.on('resign', function(msg) {
+            var gameToRemove = document.getElementById('game-board'+msg.gameId);
+            gameToRemove.parentElement.removeChild(gameToRemove);
       });
                          
       socket.on('move', function (msg) {
